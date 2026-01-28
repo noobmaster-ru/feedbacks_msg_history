@@ -1,7 +1,7 @@
 import json
 import logging
 import sys
-
+from datetime import datetime
 import os
 import time
 from src.wb_api import WbAPI
@@ -25,27 +25,39 @@ if __name__ == "__main__":
         "Authorization": os.getenv('WB_TOKEN')
     }
     SERVICE_ACCOUNT_JSON = "sunny-might-477012-c4-04c66c69a92f.json"
+    
     parser = WbAPI(headers=HEADERS)
     spreadsheet = GoogleSheets(service_account_json_path=SERVICE_ACCOUNT_JSON)
-    
 
-    parser.start_requesting()
-    spreadsheet.write_into_sheetname("Messages", parser.text_messages)
+    parser.get_data_from_wb_api()
+    parser.grouping_chats()
+    daytime_csv = f"{datetime.now().strftime("%H:%M:%S")}.csv"
+    # for nm_id in config.target_nmids:
+    data_rows = parser.process_chat_events_and_generate_csv(
+        seller_message_to_filter=config.seller_message_to_filter,
+        target_nm_id=config.target_nmids,
+        filename=daytime_csv
+    )
+    spreadsheet.write_into_sheetname("Messages",data_rows)
+    spreadsheet.update_time()
     
-    # очистили старые значения, чтобы не писать их снова
-    parser.all_events.clear()
-    parser.text_messages.clear()
-    logger.info(f"continue parsing, sleep for {config.UPDATE_TIME}")
     while True:
+        logger.info(f'sleep {config.UPDATE_TIME}')
         time.sleep(config.UPDATE_TIME)
-        parser.parse_next_messages()
-        spreadsheet.write_into_sheetname("Messages", parser.text_messages)
-    
-    # with open("text_messages.json", "w", encoding="utf-8") as f:
-    #     json.dump(parser.text_messages, f, ensure_ascii=False, indent=2)
-
-    # with open("all_events.json", "w", encoding="utf-8") as f:
-    #     json.dump(parser.all_events, f, ensure_ascii=False, indent=2)
+        parser.all_events.clear()
+        parser.grouped_events_by_chat_id.clear()
+        parser.processed_dialogues.clear()
+        parser.relevant_chat_ids.clear()
+        parser.filtered_dialogues_by_seller_message.clear()
         
-    # with open("chat_ids_nm_ids.json", "w", encoding="utf-8") as f:
-    #     json.dump(parser.chat_ids_nm_ids, f, ensure_ascii=False, indent=2)
+        parser.get_data_from_wb_api()
+        parser.grouping_chats()
+        
+        # for nm_id in config.target_nmids:
+        data_rows = parser.process_chat_events_and_generate_csv(
+            seller_message_to_filter=config.seller_message_to_filter,
+            target_nm_id=config.target_nmids,
+            filename=daytime_csv
+        )
+        spreadsheet.write_into_sheetname("Messages",data_rows)
+        spreadsheet.update_time()
