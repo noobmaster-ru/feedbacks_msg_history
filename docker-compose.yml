@@ -1,0 +1,10 @@
+# prod: cashback_bot
+services:
+  feedback:
+    build: .
+    container_name: feedback
+    command: ["/app/.venv/bin/python", "main.py"]   
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
