@@ -143,7 +143,7 @@ class WbAPI:
         logger.info(f"Relevants chat ids: {self.relevant_chat_ids}")
 
     # make self.filtered_dialogues_by_seller_message
-    def filtering_dialogues_by_seller_message(self, seller_message_to_filter: str):
+    def filtering_dialogues_by_seller_message(self): #seller_message_to_filter: str):
         # 5. Filter by Seller Message
         logger.info("Filter by Seller Message")
         # filtered_dialogues_by_seller_message = {}
@@ -151,9 +151,9 @@ class WbAPI:
             if chat_id in self.processed_dialogues:
                 messages = self.processed_dialogues[chat_id]
                 if messages:
-                    first_message = messages[0]
-                    if first_message.get('sender') == 'seller': # and first_message.get('text') == seller_message_to_filter:
-                        self.filtered_dialogues_by_seller_message[chat_id] = messages
+                    # first_message = messages[0]
+                    # if first_message.get('sender') == 'seller': # and first_message.get('text') == seller_message_to_filter:
+                    self.filtered_dialogues_by_seller_message[chat_id] = messages
         logger.info(f"Filtered dialogues: {len(self.filtered_dialogues_by_seller_message)} dialogues start with the specified seller message and are associated with target nmIDs.")
 
     # make csv_data and save .csv

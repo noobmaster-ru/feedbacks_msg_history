@@ -36,12 +36,12 @@ if __name__ == "__main__":
     parser.grouping_chats_by_chat_id()
     parser.processing_dialogs()
     parser.filtering_chat_ids_by_target_nm_ids(target_nm_ids=config.target_nmids)
-    parser.filtering_dialogues_by_seller_message(seller_message_to_filter=config.seller_message_to_filter)
+    parser.filtering_dialogues_by_seller_message()
     
     daytime_csv_filename = f"{datetime.now(ZoneInfo("Europe/Moscow")).strftime("%H:%M:%S")}.csv"
     data_rows = parser.process_chat_events_and_generate_csv(filename=daytime_csv_filename)
     
-    spreadsheet.write_into_sheetname("Messages", data_rows)
+    spreadsheet.write_into_sheetname(config.CHATS_SHEETNAME, data_rows)
     spreadsheet.update_time()
     
     while True:
@@ -57,11 +57,11 @@ if __name__ == "__main__":
         parser.grouping_chats_by_chat_id()
         parser.processing_dialogs()
         parser.filtering_chat_ids_by_target_nm_ids(target_nm_ids=config.target_nmids)
-        parser.filtering_dialogues_by_seller_message(seller_message_to_filter=config.seller_message_to_filter)
+        parser.filtering_dialogues_by_seller_message()
     
         # for nm_id in config.target_nmids:
         daytime_csv_filename = f"{datetime.now().strftime("%H:%M:%S")}.csv"
         data_rows = parser.process_chat_events_and_generate_csv(filename=daytime_csv_filename)
         
-        spreadsheet.write_into_sheetname("Messages", data_rows)
+        spreadsheet.write_into_sheetname(config.CHATS_SHEETNAME, data_rows)
         spreadsheet.update_time()
